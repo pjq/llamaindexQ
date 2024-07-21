@@ -1,0 +1,10 @@
+{
+  "Settings": {
+    "llm": {
+      "temperature": 0.2,
+      "model": "gpt-4o",
+      "api_key": "sk-demo-key",
+      "api_base": "https://api.openai.com/v1"
+    }
+  }
+}
