@@ -9,28 +9,14 @@ from llama_index.core import (
     StorageContext,
     load_index_from_storage,
 )
+from llm_utils import load_and_initialize_llm
 
-CONFIG_PATH = 'config.json'
+
 PERSIST_DIR = "./storage"
 DATA_DIR = "data"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def load_config(config_path):
-    logging.info(f"Loading configuration from {config_path}")
-    with open(config_path, 'r') as config_file:
-        return json.load(config_file)
-
-def initialize_llm(settings):
-    logging.info("Initializing LLM with provided settings")
-    llm_settings = settings['llm']
-    Settings.llm = OpenAI(
-        temperature=llm_settings['temperature'], 
-        model=llm_settings['model'], 
-        api_key=llm_settings['api_key'], 
-        api_base=llm_settings['api_base']
-    )
 
 def create_index(data_dir, persist_dir):
     logging.info(f"Creating index from documents in {data_dir}")
@@ -65,9 +51,8 @@ def chat_with_bot(query_engine):
 
 def main():
     logging.info("Starting ChatBot application")
-    config = load_config(CONFIG_PATH)
-    initialize_llm(config['Settings'])
-    
+    load_and_initialize_llm()
+
     index = load_or_create_index(PERSIST_DIR, DATA_DIR)
     
     query_engine = index.as_query_engine()
