@@ -1,12 +1,15 @@
 import logging
+import os
 from llama_index.core.tools import FunctionTool
 from pydantic import BaseModel, Field
 from llm_utils import load_and_initialize_llm
 from llama_index.core.agent import ReActAgent
+import base64
 import random
 from llama_index.multi_modal_llms.openai import OpenAIMultiModal
 from llama_index.core.multi_modal_llms.generic_utils import load_image_urls
 from PIL import Image
+from llama_index.core.schema import ImageDocument
 import requests
 from io import BytesIO
 import matplotlib.pyplot as plt
@@ -66,26 +69,33 @@ def capture_image() -> str:
 def mock_capture_image() -> str:
     """Mock capture an image from the car's camera."""
     logger.info("Mock: Capturing image from camera")
-    return "mock_captured_image.jpg"
+    # return "mock_captured_image.jpg"
+    return "image.png"
 
-# Function to process image URLs
-def process_image_urls(image_urls):
+# Function to process image URL
+def process_image_urls(image_url):
     """Process image URLs to load image documents."""
-    image_documents = load_image_urls(image_urls)
+    image_documents = load_image_urls([image_url])
     return image_documents
 
+
 # Real function to describe images
-def describe_images(image_urls):
+def describe_images(image_path):
     """Describe images using the multi-modal LLM."""
-    image_documents = process_image_urls(image_urls)
-    response = llm.complete(
-        prompt="Describe the images as an alternative text",
-        image_documents=image_documents,
-    )
+    image_document = ImageDocument(image_path=image_path)
+
+    try:
+        response = llm.complete(
+            prompt="Describe the images as an alternative text",
+            image_documents=[image_document],
+        )
+    except Exception as e:
+        logger.error("Failed to complete LLM request: %s", str(e))
+        response = "Error: Unable to describe images."
     return response
 
 # Mock function to describe images
-def mock_describe_images(image_urls):
+def mock_describe_images(image_path):
     """Mock describe images."""
     logger.info("Mock: Describing images")
     import random

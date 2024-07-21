@@ -1,6 +1,7 @@
 import json
 import logging
 from llama_index.llms.openai import OpenAI
+from llama_index.multi_modal_llms.openai import OpenAIMultiModal
 
 CONFIG_PATH = 'config.json'
 
@@ -17,6 +18,7 @@ def initialize_llm(settings, use_multi_modal=False):
         return OpenAIMultiModal(
             model=llm_settings['model'], 
             api_key=llm_settings['api_key'], 
+            api_base=llm_settings['api_base'],
             max_new_tokens=llm_settings.get('max_new_tokens', 300)
         )
     else:
@@ -29,6 +31,6 @@ def initialize_llm(settings, use_multi_modal=False):
 
 def load_and_initialize_llm(config_path=CONFIG_PATH):
     config = load_config(config_path)
-    llm = initialize_llm(config['Settings'])
+    llm = initialize_llm(config['Settings'], use_multi_modal=True)
     
     return llm
