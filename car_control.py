@@ -14,6 +14,7 @@ import requests
 from io import BytesIO
 import matplotlib.pyplot as plt
 import cv2  # OpenCV for capturing images from the camera
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -41,12 +42,18 @@ def mock_turn_car(direction: str, duration: int) -> str:
     return f"Mock: Car would turn {direction} for {duration} seconds."
 
 # Real function to capture image from the car's camera
+# Real function to capture image from the car's camera
 def capture_image() -> str:
     """Capture an image from the car's camera."""
     cap = cv2.VideoCapture(0)  # Assuming the camera is at index 0
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     if not cap.isOpened():
         logger.error("Failed to open camera")
         return "Failed to open camera"
+    
+    # Allow the camera to warm up
+    time.sleep(3)
     
     ret, frame = cap.read()
     if not ret:
@@ -60,8 +67,13 @@ def capture_image() -> str:
         cap.release()
         return "Captured frame is empty"
     
+    # Convert the frame to RGB (if needed)
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    
     image_path = "captured_image.jpg"
-    cv2.imwrite(image_path, frame)
+    # cv2.imwrite(image_path, frame)    
+    cv2.imwrite(image_path, frame_rgb)
+
     cap.release()
     return image_path
 
